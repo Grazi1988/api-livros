@@ -77,6 +77,19 @@ def listar_livros():
 
     return jsonify(livros_formatados), 200
 
+@app.route('/delete/<int:id>', methods=['DELETE'])
+def excluir_livros(id):
+    with sqlite3.connect('database.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM livros WHERE id = ?", (id, ))
+        conn.commit()
+
+    if cursor.rowcount == 0:
+        return jsonify({"erro": "Este livro existe?"}), 400
+
+    return jsonify({"mensage": "Retiramos este livro da galeria!"}), 200
+
+
 
 @app.route("/editar/<int:id>", methods=["PUT"])
 def atualizar_livros(id):
@@ -105,7 +118,7 @@ def atualizar_livros(id):
             parametro.append(image_url)
 
         if not atualizacao:
-            return jsonify({'erro': "Nenhum dado foi fornecido para atualizar"}),400
+            return jsonify({'erro': "Nenhum dado foi atualizado"}),400
                     
         parametro.append(id)
 
@@ -114,8 +127,8 @@ def atualizar_livros(id):
         conn.commit()
 
         if cursor.rowcount == 0:
-            return jsonify({'erro': "Tem certeza sobre o que mudou? Não vi nada!"}), 404
-    return jsonify({'mensagem': "Agora confiamos que está tudo certo!"}), 200
+            return jsonify({'erro': "Tem certeza sobre o que mudou?"}), 404
+    return jsonify({'mensagem': "Agora está tudo certo!"}), 200
     
 
 if __name__ == "__main__":
